@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Space Invaders</title>
+<title>Bokoblin Attack!</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>🚀 Space Invaders!</h1>
-<canvas id="game" width="400" height="500"></canvas>
-<p>Score: <span id="score">0</span></p>
+<h1>🚀 Bokoblin Attack!</h1>
+<div class="game-wrap">
+	<canvas id="game" width="400" height="500"></canvas>
+	<p>Score: <span id="score">0</span></p>
+</div>
+
+<!-- Touch controls for mobile -->
+<div class="touch-controls" aria-hidden="false">
+	<button class="btn" data-action="left">◀</button>
+	<button class="btn" data-action="up">▲</button>
+	<button class="btn" data-action="down">▼</button>
+	<button class="btn" data-action="right">▶</button>
+	<button class="btn shoot" data-action="shoot">⦿</button>
+</div>
 
 <script src="game.js"></script>
 </body>
