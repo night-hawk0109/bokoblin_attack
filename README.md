@@ -16,3 +16,5 @@ Then push your local change to the main repository:
 
 `git push`
 
+# Why isn't auth working?  
+
