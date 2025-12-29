@@ -9,12 +9,20 @@ x: 180,
 y: 440,
 width: 75,
 height: 65,
-speed: 5
-};
+speed: 3};
 
 // Animated spaceship image (place spaceship.gif in the project root)
 const shipImg = new Image();
 shipImg.src = "spaceship.gif";
+
+// Monster image (place monster.gif in the project root)
+const monsterImg = new Image();
+monsterImg.src = "monster.gif";
+
+// Background image (place background.gif in the project root)
+const bgImg = new Image();
+bgImg.src = "background.gif";
+
 let bullets = [];
 let monsters = [];
 let spawnTimer = 0;
@@ -34,7 +42,7 @@ function shoot() {
 bullets.push({
 x: player.x + player.width / 2 - 2,
 y: player.y,
-speed: 5
+speed: 3
 });
 }
 
@@ -57,13 +65,16 @@ x: Math.random() * (canvas.width - 50),
 y: 0,
 width: 50,
 height: 50,
-speed: 2
+speed: 1
 });
 spawnTimer = 0;
 }
 
 // Move monsters
-monsters.forEach((m) => (m.y += m.speed));
+monsters.forEach((m) => {
+m.y += m.speed;
+m.x += (player.x - m.x) * 0.005; // Move towards player horizontally
+});
 monsters = monsters.filter((m) => m.y < canvas.height);
 
 // Collision detection
@@ -85,6 +96,14 @@ score++;
 function draw() {
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+// Background
+if (bgImg.complete && bgImg.naturalWidth !== 0) {
+	ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+} else {
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
 // Player
 // If the GIF has loaded, draw it; otherwise draw a placeholder rectangle
 if (shipImg.complete && shipImg.naturalWidth !== 0) {
@@ -101,10 +120,26 @@ ctx.fillRect(b.x, b.y, 4, 10)
 );
 
 // Monsters
-ctx.fillStyle = "purple";
-monsters.forEach((m) =>
-ctx.fillRect(m.x, m.y, m.width, m.height)
-);
+monsters.forEach((m) => {
+if (monsterImg.complete && monsterImg.naturalWidth !== 0) {
+	ctx.drawImage(monsterImg, m.x, m.y, m.width, m.height);
+} else {
+	ctx.fillStyle = "purple";
+	ctx.fillRect(m.x, m.y, m.width, m.height);
+}
+
+// Draw dark green diamond around monster
+const cx = m.x + m.width / 2;
+const cy = m.y + m.height / 2;
+const r = 40; // size of diamond
+ctx.fillStyle = "darkgreen";
+for (let dy = -r; dy <= r; dy += 2) {
+	const width = r - Math.abs(dy);
+	for (let dx = -width; dx <= width; dx += 2) {
+		ctx.fillRect(cx + dx, cy + dy, 2, 2);
+	}
+}
+});
 
 // Score
 ctx.fillStyle = "white";
