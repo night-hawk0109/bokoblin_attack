@@ -8,4 +8,48 @@ font-family: monospace;
 canvas {
 background: #111;
 border: 2px solid white;
+/* Make canvas responsive: keep a fixed internal resolution (400x500)
+	 but scale its displayed size to the viewport */
+width: 100%;
+max-width: 400px;
+height: auto;
+display: block;
+}
+
+.game-wrap {
+	display: inline-block;
+	position: relative;
+}
+
+.touch-controls {
+	position: fixed;
+	bottom: 16px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	z-index: 999;
+	pointer-events: auto;
+}
+
+.touch-controls .btn {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.08);
+	border: 1px solid rgba(255,255,255,0.18);
+	color: white;
+	font-size: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	touch-action: none;
+	/* Use a font that contains arrow and symbol glyphs to avoid encoding issues */
+	font-family: system-ui, -apple-system, "Segoe UI Symbol", "Segoe UI Emoji", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.touch-controls .shoot {
+	background: rgba(255,50,50,0.18);
+	border-color: rgba(255,50,50,0.3);
 }

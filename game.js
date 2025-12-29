@@ -36,6 +36,16 @@ let monsters = [];
 let spawnTimer = 0;
 let keys = {};
 
+// Responsive canvas: keep logical size but scale displayed size
+function resizeCanvas() {
+	const ratio = canvas.height / canvas.width;
+	const vw = Math.min(window.innerWidth - 20, 400);
+	canvas.style.width = vw + 'px';
+	canvas.style.height = (vw * ratio) + 'px';
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 // Controls
 document.addEventListener("keydown", (e) => {
 keys[e.key] = true;
@@ -47,26 +57,55 @@ keys[e.key] = false;
 });
 
 function shoot() {
-bullets.push({
-x: player.x + player.width / 2 - 2,
-y: player.y,
-speed: 3
-});
+	bullets.push({
+		x: player.x + player.width / 2 - 2,
+		y: player.y,
+		speed: 3,
+		width: 4,
+		height: 10,
+		color: 'yellow'
+	});
 }
+
+
+// Touch / mouse controls: wire buttons with data-action attributes
+function bindTouchControls() {
+	const buttons = document.querySelectorAll('.touch-controls .btn');
+	buttons.forEach((btn) => {
+		const action = btn.dataset.action;
+		// touchstart
+		btn.addEventListener('touchstart', (ev) => {
+			ev.preventDefault();
+			if (action === 'shoot') shoot(); else keys[action] = true;
+		}, {passive: false});
+		// touchend
+		btn.addEventListener('touchend', (ev) => {
+			ev.preventDefault();
+			if (action !== 'shoot') keys[action] = false;
+		});
+		// mouse support for desktop testing
+		btn.addEventListener('mousedown', (ev) => {
+			ev.preventDefault();
+			if (action === 'shoot') shoot(); else keys[action] = true;
+		});
+		document.addEventListener('mouseup', () => { if (action !== 'shoot') keys[action] = false; });
+	});
+}
+bindTouchControls();
 
 // Game loop
 function update() {
 // Move player
-if (keys["a"] && player.x > 0) player.x -= player.speed;
-if (keys["d"] && player.x < canvas.width - player.width)
-player.x += player.speed;
-if (keys["w"] && player.y > 0) player.y -= player.speed;
-if (keys["s"] && player.y < canvas.height - player.height)
-player.y += player.speed;
+if ((keys["a"] || keys['ArrowLeft'] || keys['left']) && player.x > 0) player.x -= player.speed;
+if ((keys["d"] || keys['ArrowRight'] || keys['right']) && player.x < canvas.width - player.width)
+	player.x += player.speed;
+if ((keys["w"] || keys['ArrowUp'] || keys['up']) && player.y > 0) player.y -= player.speed;
+if ((keys["s"] || keys['ArrowDown'] || keys['down']) && player.y < canvas.height - player.height)
+	player.y += player.speed;
 
 // Move bullets
 bullets.forEach((b) => (b.y -= b.speed));
-bullets = bullets.filter((b) => b.y > 0);
+bullets = bullets.filter((b) => b.y + (b.height || 0) > 0);
 
 // Spawn monsters
 spawnTimer++;
@@ -92,13 +131,16 @@ monsters = monsters.filter((m) => m.y < canvas.height);
 bullets.forEach((b, bi) => {
 monsters.forEach((m, mi) => {
 if (b.x < m.x + m.width &&
-b.x + 4 > m.x &&
-b.y < m.y + m.height &&
-b.y + 10 > m.y) {
+	b.x + (b.width || 4) > m.x &&
+	b.y < m.y + m.height &&
+	b.y + (b.height || 10) > m.y) {
 // Hit!
 bullets.splice(bi, 1);
 monsters.splice(mi, 1);
 score++;
+// mirror score into DOM if present
+const scoreEl = document.getElementById('score');
+if (scoreEl) scoreEl.textContent = score;
 }
 });
 });
@@ -120,9 +162,14 @@ if (shipImg.complete && shipImg.naturalWidth !== 0) {
 
 // Bullets
 bullets.forEach((b) => {
-if (bulletImg.complete && bulletImg.naturalWidth !== 0) {
-	ctx.drawImage(bulletImg, b.x, b.y, 4, 10);
-}
+	const bw = b.width || 4;
+	const bh = b.height || 10;
+	if (bulletImg.complete && bulletImg.naturalWidth !== 0) {
+		ctx.drawImage(bulletImg, b.x, b.y, bw, bh);
+	} else {
+		ctx.fillStyle = b.color || 'yellow';
+		ctx.fillRect(b.x, b.y, bw, bh);
+	}
 });
 
 // Monsters
