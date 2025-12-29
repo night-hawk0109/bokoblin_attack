@@ -37,6 +37,7 @@ let bullets = [];
 let monsters = [];
 let spawnTimer = 0;
 let keys = {};
+let slashActive = false;
 
 // Responsive canvas: keep logical size but scale displayed size
 function resizeCanvas() {
@@ -52,10 +53,17 @@ resizeCanvas();
 document.addEventListener("keydown", (e) => {
 keys[e.key] = true;
 if (e.key === " ") shoot();
+if (e.key === 'x' || e.key === 'x') slash();
 });
 
 document.addEventListener("keyup", (e) => {
 keys[e.key] = false;
+});
+
+document.addEventListener("mousedown", (e) => {
+if (e.button === 0) { // left click
+shoot();
+}
 });
 
 function shoot() {
@@ -67,6 +75,12 @@ function shoot() {
 		height: 100,
 		color: 'yellow'
 	});
+}
+
+function slash() {
+	if (slashActive) return;
+	slashActive = true;
+	setTimeout(() => slashActive = false, 200);
 }
 
 
@@ -119,7 +133,8 @@ x: Math.random() * (canvas.width - 50),
 y: 0,
 width: 50,
 height: 50,
-speed: 1
+speed: 1,
+vx: (Math.random() - 0.5) * 2
 });
 spawnTimer = 0;
 }
@@ -128,7 +143,8 @@ spawnTimer = 0;
 for (let i = monsters.length - 1; i >= 0; i--) {
 	const m = monsters[i];
 	m.y += m.speed;
-	m.x += (player.x - m.x) * 0.005; // Move towards player horizontally
+	m.x += m.vx || 0;
+	if (m.x < 0 || m.x > canvas.width - m.width) m.vx = - (m.vx || 0);
 
 	// Collision with player
 	if (m.x < player.x + player.width &&
@@ -164,6 +180,19 @@ if (scoreEl) scoreEl.textContent = score;
 }
 });
 });
+
+// Slash attack collision
+if (slashActive) {
+	for (let i = monsters.length - 1; i >= 0; i--) {
+		const m = monsters[i];
+		if (Math.abs(m.x - (player.x + player.width / 2)) < 60 && m.y > player.y - 20 && m.y < player.y + player.height + 20) {
+			monsters.splice(i, 1);
+			score++;
+			const scoreEl = document.getElementById('score');
+			if (scoreEl) scoreEl.textContent = score;
+		}
+	}
+}
 }
 
 function draw() {
@@ -191,6 +220,16 @@ bullets.forEach((b) => {
 		ctx.fillRect(b.x, b.y, bw, bh);
 	}
 });
+
+// Slash attack visual
+if (slashActive) {
+	ctx.strokeStyle = 'red';
+	ctx.lineWidth = 5;
+	ctx.beginPath();
+	ctx.moveTo(player.x + player.width, player.y + player.height / 2);
+	ctx.lineTo(player.x + player.width + 50, player.y + player.height / 2 - 10);
+	ctx.stroke();
+}
 
 // Monsters
 monsters.forEach((m) => {
