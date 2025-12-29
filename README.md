@@ -15,6 +15,3 @@ After you make code updates (after each feature), commit your changes via the fo
 Then push your local change to the main repository:
 
 `git push`
-
-# Why isn't auth working?  
-
