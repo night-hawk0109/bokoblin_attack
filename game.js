@@ -23,6 +23,14 @@ monsterImg.src = "monster.gif";
 const bgImg = new Image();
 bgImg.src = "background.gif";
 
+// Diamond image (place diamond.gif in the project root)
+const diamondImg = new Image();
+diamondImg.src = "diamond.gif";
+
+// Bullet image (place bullet.gif in the project root)
+const bulletImg = new Image();
+bulletImg.src = "bullet.gif";
+
 let bullets = [];
 let monsters = [];
 let spawnTimer = 0;
@@ -52,6 +60,9 @@ function update() {
 if (keys["a"] && player.x > 0) player.x -= player.speed;
 if (keys["d"] && player.x < canvas.width - player.width)
 player.x += player.speed;
+if (keys["w"] && player.y > 0) player.y -= player.speed;
+if (keys["s"] && player.y < canvas.height - player.height)
+player.y += player.speed;
 
 // Move bullets
 bullets.forEach((b) => (b.y -= b.speed));
@@ -99,45 +110,33 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
 // Background
 if (bgImg.complete && bgImg.naturalWidth !== 0) {
 	ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-} else {
-	ctx.fillStyle = "black";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 // Player
 // If the GIF has loaded, draw it; otherwise draw a placeholder rectangle
 if (shipImg.complete && shipImg.naturalWidth !== 0) {
 	ctx.drawImage(shipImg, player.x, player.y, player.width, player.height);
-} else {
-	ctx.fillStyle = "lime";
-	ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
 // Bullets
-ctx.fillStyle = "red";
-bullets.forEach((b) =>
-ctx.fillRect(b.x, b.y, 4, 10)
-);
+bullets.forEach((b) => {
+if (bulletImg.complete && bulletImg.naturalWidth !== 0) {
+	ctx.drawImage(bulletImg, b.x, b.y, 4, 10);
+}
+});
 
 // Monsters
 monsters.forEach((m) => {
 if (monsterImg.complete && monsterImg.naturalWidth !== 0) {
 	ctx.drawImage(monsterImg, m.x, m.y, m.width, m.height);
-} else {
-	ctx.fillStyle = "purple";
-	ctx.fillRect(m.x, m.y, m.width, m.height);
 }
 
-// Draw dark green diamond around monster
+// Draw diamond image around monster
 const cx = m.x + m.width / 2;
 const cy = m.y + m.height / 2;
-const r = 40; // size of diamond
-ctx.fillStyle = "darkgreen";
-for (let dy = -r; dy <= r; dy += 2) {
-	const width = r - Math.abs(dy);
-	for (let dx = -width; dx <= width; dx += 2) {
-		ctx.fillRect(cx + dx, cy + dy, 2, 2);
-	}
+const size = 80; // size of diamond image
+if (diamondImg.complete && diamondImg.naturalWidth !== 0) {
+	ctx.drawImage(diamondImg, cx - size / 2, cy - size / 2, size, size);
 }
 });
 
