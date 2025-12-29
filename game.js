@@ -62,9 +62,9 @@ function shoot() {
 	bullets.push({
 		x: player.x + player.width / 2 - 2,
 		y: player.y,
-		speed: 3,
-		width: 4,
-		height: 10,
+		speed: 4,
+		width: 60,
+		height: 100,
 		color: 'yellow'
 	});
 }
@@ -182,8 +182,8 @@ if (shipImg.complete && shipImg.naturalWidth !== 0) {
 
 // Bullets
 bullets.forEach((b) => {
-	const bw = b.width || 4;
-	const bh = b.height || 10;
+	const bw = b.width || 60;
+	const bh = b.height || 100;
 	if (bulletImg.complete && bulletImg.naturalWidth !== 0) {
 		ctx.drawImage(bulletImg, b.x, b.y, bw, bh);
 	} else {
